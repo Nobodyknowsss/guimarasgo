@@ -40,3 +40,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/generated/prisma
+.claude
+progress.md
+features.md
+architecture.md
+CLAUDE.md

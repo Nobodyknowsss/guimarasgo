@@ -1,0 +1,36 @@
+// GuimarasGo — Prisma schema
+//
+// Conventions for this project:
+//   - Models stay PascalCase; columns/tables map to snake_case in Postgres via @map / @@map.
+//   - User.id mirrors auth.users.id (same UUID) but is NOT a foreign key. The link is
+//     maintained by Postgres triggers on auth.users — see prisma/migrations/<init>/migration.sql.
+//   - role is nullable. NULL means "signed up, no access yet". Admin promotes manually.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  PARTNER
+
+  @@map("user_role")
+}
+
+model User {
+  // Same UUID as auth.users.id. Kept in sync by triggers, not by FK.
+  id        String    @id @db.Uuid
+  email     String    @unique
+  fullName  String?   @map("full_name")
+  phone     String?
+  role      UserRole?
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt      @map("updated_at") @db.Timestamptz(6)
+
+  @@map("users")
+}

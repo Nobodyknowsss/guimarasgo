@@ -1,11 +1,3 @@
-// GuimarasGo — Prisma schema
-//
-// Conventions for this project:
-//   - Models stay PascalCase; columns/tables map to snake_case in Postgres via @map / @@map.
-//   - User.id mirrors auth.users.id (same UUID) but is NOT a foreign key. The link is
-//     maintained by Postgres triggers on auth.users — see prisma/migrations/<init>/migration.sql.
-//   - On signup, the trigger defaults role to CUSTOMER. ADMIN is assigned manually in the DB.
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -15,24 +7,41 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserRole {
-  ADMIN
-  CUSTOMER
-
-  @@map("user_role")
-}
-
 model User {
-  // Same UUID as auth.users.id. Kept in sync by triggers, not by FK.
   id        String    @id @db.Uuid
   email     String    @unique
-  firstName String?   @map("first_name")
-  lastName  String?   @map("last_name")
   phone     String?
-  fbLink    String?   @map("fb_link")
   role      UserRole?
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt      @map("updated_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  firstName String?   @map("first_name")
+  lastName  String?   @map("last_name")
+  fbLink    String?   @map("fb_link")
 
   @@map("users")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model island_hopping_listings {
+  id            String   @id @db.Uuid
+  category      String
+  location      String
+  title         String
+  photos        Json     @default("[]")
+  price         Int
+  price_unit    String
+  max_per_day   Int
+  description   String
+  highlights    String[] @default([])
+  islands       String[] @default([])
+  included      String[] @default([])
+  meeting_point String
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @db.Timestamptz(6)
+}
+
+enum UserRole {on the im
+  ADMIN
+  CUSTOMER
+  @@map("user_role")
 }

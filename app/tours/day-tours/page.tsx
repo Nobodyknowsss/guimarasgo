@@ -1,66 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Sun, MapPin, Star, Users, ArrowLeft } from "lucide-react";
+import { MapPin, Star, Users, ArrowLeft, ArrowRight } from "lucide-react";
 
 import { SiteHeader } from "@/components/landing/site-header";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { Badge } from "@/components/ui/badge";
+import { badgeStyles } from "@/lib/tours/shared";
+import { dayToursMeta, dayTours } from "@/lib/tours/day-tours";
 
-const offerings = [
-  {
-    title: "Trappist Monastery & Mango Farm",
-    location: "Jordan",
-    price: 1200,
-    rating: 4.9,
-    reviews: 184,
-    duration: "Half day",
-    description:
-      "Quiet morning at the Trappist Monastery, then a stop at a working mango plantation for tastings and a snack.",
-    badge: "Popular",
-    gradient: "from-amber-400 via-orange-500 to-rose-500",
-  },
-  {
-    title: "Guisi Lighthouse Day Trip",
-    location: "Nueva Valencia",
-    price: 1500,
-    rating: 4.7,
-    reviews: 96,
-    duration: "Half day",
-    description:
-      "Spanish-era lighthouse ruins on a clifftop, with a viewpoint sunset stop on the way back. Snacks included.",
-    badge: null,
-    gradient: "from-emerald-400 via-teal-500 to-cyan-600",
-  },
-  {
-    title: "South Guimaras Heritage Loop",
-    location: "Nueva Valencia · Sibunag",
-    price: 1800,
-    rating: 4.8,
-    reviews: 71,
-    duration: "Full day",
-    description:
-      "Old churches, fishing villages, and the south coast viewpoints — a full-day driver-guided loop with lunch.",
-    badge: "New",
-    gradient: "from-violet-400 via-purple-500 to-fuchsia-600",
-  },
-  {
-    title: "Northern Coves & Beaches",
-    location: "Buenavista",
-    price: 1400,
-    rating: 4.8,
-    reviews: 58,
-    duration: "Full day",
-    description:
-      "Hidden coves and quiet white-sand stretches on the north shore. Perfect for couples and small families.",
-    badge: null,
-    gradient: "from-sky-400 via-blue-500 to-indigo-600",
-  },
-];
-
-const badgeStyles: Record<string, string> = {
-  Popular: "bg-cta text-cta-foreground",
-  New: "bg-primary text-primary-foreground",
-  Premium: "bg-slate-900 text-white",
+export const metadata: Metadata = {
+  title: `${dayToursMeta.label} — GuimarasGo`,
+  description: dayToursMeta.intro,
 };
+
+const Icon = dayToursMeta.icon;
 
 export default function DayToursPage() {
   return (
@@ -78,19 +31,17 @@ export default function DayToursPage() {
             </Link>
             <div className="mt-6 flex items-center gap-3">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
-                <Sun className="h-5 w-5" />
+                <Icon className="h-5 w-5" />
               </span>
               <span className="text-sm font-semibold uppercase tracking-wider text-primary">
-                Day Tours
+                {dayToursMeta.label}
               </span>
             </div>
             <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              See the island by land
+              {dayToursMeta.title}
             </h1>
             <p className="mt-3 max-w-2xl text-pretty text-muted-foreground">
-              Driver-guided day tours hitting Guimaras&apos; landmarks, mango
-              farms, and hidden viewpoints. Reserve a slot for ₱100 — pay the
-              balance on arrival.
+              {dayToursMeta.intro}
             </p>
           </div>
         </section>
@@ -98,69 +49,64 @@ export default function DayToursPage() {
         <section className="py-16 sm:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-6 sm:grid-cols-2">
-              {offerings.map((o) => (
-                <article
-                  key={o.title}
-                  className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+              {dayTours.map((tour) => (
+                <Link
+                  key={tour.slug}
+                  href={`/tours/day-tours/${tour.slug}`}
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
                 >
                   <div
-                    className={`relative aspect-[16/9] overflow-hidden bg-gradient-to-br ${o.gradient}`}
+                    className={`relative aspect-[16/9] overflow-hidden bg-gradient-to-br ${tour.gradient}`}
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.25),transparent_60%)]" />
-                    {o.badge ? (
+                    {tour.badge ? (
                       <Badge
-                        className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold shadow-md ${badgeStyles[o.badge]}`}
+                        className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold shadow-md ${badgeStyles[tour.badge]}`}
                       >
-                        {o.badge}
+                        {tour.badge}
                       </Badge>
                     ) : null}
                     <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm">
                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      {o.rating}
-                      <span className="text-muted-foreground">
-                        ({o.reviews})
-                      </span>
+                      {tour.rating}
+                      <span className="text-muted-foreground">({tour.reviews})</span>
                     </div>
                   </div>
-                  <div className="p-6">
+                  <div className="flex flex-1 flex-col p-6">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <MapPin className="h-3.5 w-3.5" />
-                      {o.location}
+                      {tour.location}
                     </div>
                     <h3 className="mt-2 text-xl font-semibold text-foreground transition-colors group-hover:text-primary">
-                      {o.title}
+                      {tour.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {o.description}
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                      {tour.shortDescription}
                     </p>
 
                     <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-end sm:justify-between">
                       <div>
-                        <span className="text-xs text-muted-foreground">
-                          from
-                        </span>
+                        <span className="text-xs text-muted-foreground">from</span>
                         <p className="text-xl font-bold text-foreground">
-                          ₱{o.price.toLocaleString()}
+                          ₱{tour.price.toLocaleString()}
                           <span className="ml-1 text-xs font-normal text-muted-foreground">
-                            / group
+                            / {dayToursMeta.priceUnit}
                           </span>
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                           <Users className="h-3.5 w-3.5" />
-                          {o.duration}
+                          {tour.duration}
                         </span>
-                        <Link
-                          href="/book"
-                          className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-                        >
-                          Reserve ₱100
-                        </Link>
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors group-hover:text-primary">
+                          More Details
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                        </span>
                       </div>
                     </div>
                   </div>
-                </article>
+                </Link>
               ))}
             </div>
           </div>

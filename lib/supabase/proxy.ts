@@ -47,15 +47,24 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  // Browsing is public by design: the landing page, tour/rental listings, and
+  // auth pages are all reachable without an account. Only these areas require a
+  // logged-in customer — the ₱100 Reserve flow (/book) and account management
+  // (/admin is reserved for the owner dashboard and is fail-closed here too).
+  // Authorization is enforced AGAIN in server code (see CLAUDE.md "Authorization
+  // lives in server code"); this edge check just sends logged-out visitors to
+  // login early and remembers where they were headed via ?next=.
+  const PROTECTED_PREFIXES = ["/account", "/bookings", "/book", "/admin"];
+  const { pathname } = request.nextUrl;
+  const isProtected = PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+
+  if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
+    url.search = "";
+    url.searchParams.set("next", pathname + request.nextUrl.search);
     return NextResponse.redirect(url);
   }
 

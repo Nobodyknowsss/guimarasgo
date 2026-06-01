@@ -23,5 +23,12 @@ export const IslandHoppingListingSchema = z.object({
   updated_at: z.date(),
 });
 
+export const CreateIslandHoppingListingSchema = IslandHoppingListingSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
 export type Photo = z.infer<typeof PhotoSchema>;
 export type IslandHoppingListing = z.infer<typeof IslandHoppingListingSchema>;
+export type CreateIslandHoppingListing = z.infer<typeof CreateIslandHoppingListingSchema>;

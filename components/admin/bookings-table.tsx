@@ -17,6 +17,21 @@ type Filter = (typeof filters)[number];
 
 const statusOptions: BookingStatus[] = ["confirmed", "pending", "cancelled"];
 
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60";
+
+function FeeBadge({ paid }: { paid: boolean }) {
+  return paid ? (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+      <Check className="h-3.5 w-3.5" /> Paid
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+      <X className="h-3.5 w-3.5" /> Unpaid
+    </span>
+  );
+}
+
 export function BookingsTable() {
   // Local-only state: status edits feel live but reset on reload (no backend).
   const [rows, setRows] = useState<AdminBooking[]>(adminBookings);
@@ -31,16 +46,22 @@ export function BookingsTable() {
     };
   }, [rows]);
 
-  const visible = filter === "all" ? rows : rows.filter((r) => r.status === filter);
+  const visible =
+    filter === "all" ? rows : rows.filter((r) => r.status === filter);
 
   function setStatus(id: string, status: BookingStatus) {
-    setRows((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status } : r)),
-    );
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
   }
+
+  const statusSelectClass = (status: BookingStatus) =>
+    cn(
+      "cursor-pointer rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize outline-none ring-1 ring-inset ring-transparent focus-visible:ring-primary",
+      bookingStatusStyles[status],
+    );
 
   return (
     <div className="space-y-4">
+      {/* Status filters */}
       <div className="flex flex-wrap gap-2">
         {filters.map((f) => (
           <button
@@ -48,7 +69,8 @@ export function BookingsTable() {
             type="button"
             onClick={() => setFilter(f)}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium capitalize transition-colors",
+              "inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium capitalize transition-colors",
+              focusRing,
               filter === f
                 ? "bg-primary text-primary-foreground"
                 : "bg-card text-foreground/70 ring-1 ring-border hover:text-foreground",
@@ -57,7 +79,7 @@ export function BookingsTable() {
             {f}
             <span
               className={cn(
-                "rounded-full px-1.5 text-xs",
+                "rounded-full px-1.5 text-xs tabular-nums",
                 filter === f ? "bg-white/20" : "bg-muted",
               )}
             >
@@ -67,8 +89,70 @@ export function BookingsTable() {
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
-        <table className="w-full min-w-[820px] text-sm">
+      {/* Mobile / tablet: cards */}
+      <div className="grid gap-3 md:hidden">
+        {visible.map((booking) => (
+          <div
+            key={booking.id}
+            className="rounded-2xl border border-border bg-card p-4 shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="font-medium text-foreground">
+                  {booking.customerName}
+                </div>
+                <div className="truncate text-xs text-muted-foreground">
+                  {booking.customerEmail}
+                </div>
+              </div>
+              <span className="shrink-0 font-mono text-xs text-muted-foreground">
+                {booking.reference}
+              </span>
+            </div>
+
+            <div className="mt-3">
+              <div className="text-sm text-foreground">{booking.tourTitle}</div>
+              <div className="text-xs text-muted-foreground">
+                {booking.categoryLabel}
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+              <span>{formatDate(booking.date)}</span>
+              <span>Party of {booking.partySize}</span>
+              <FeeBadge paid={booking.feePaid} />
+            </div>
+
+            <div className="mt-3">
+              <label className="sr-only" htmlFor={`status-${booking.id}`}>
+                Status for {booking.reference}
+              </label>
+              <select
+                id={`status-${booking.id}`}
+                value={booking.status}
+                onChange={(e) =>
+                  setStatus(booking.id, e.target.value as BookingStatus)
+                }
+                className={statusSelectClass(booking.status)}
+              >
+                {statusOptions.map((s) => (
+                  <option
+                    key={s}
+                    value={s}
+                    className="bg-background text-foreground"
+                  >
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: table */}
+      <div className="hidden overflow-hidden rounded-2xl border border-border bg-card shadow-sm md:block">
+        <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
               <th className="px-5 py-3 font-medium">Reference</th>
@@ -84,7 +168,7 @@ export function BookingsTable() {
             {visible.map((booking) => (
               <tr
                 key={booking.id}
-                className="border-b border-border last:border-0 transition-colors hover:bg-muted/40"
+                className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
               >
                 <td className="px-5 py-3 font-mono text-xs text-muted-foreground">
                   {booking.reference}
@@ -110,15 +194,7 @@ export function BookingsTable() {
                   {booking.partySize}
                 </td>
                 <td className="px-5 py-3">
-                  {booking.feePaid ? (
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                      <Check className="h-3.5 w-3.5" /> Paid
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                      <X className="h-3.5 w-3.5" /> Unpaid
-                    </span>
-                  )}
+                  <FeeBadge paid={booking.feePaid} />
                 </td>
                 <td className="px-5 py-3">
                   <select
@@ -126,13 +202,15 @@ export function BookingsTable() {
                     onChange={(e) =>
                       setStatus(booking.id, e.target.value as BookingStatus)
                     }
-                    className={cn(
-                      "cursor-pointer rounded-full border-0 px-2.5 py-1 text-xs font-medium capitalize outline-none ring-1 ring-inset ring-transparent focus:ring-primary",
-                      bookingStatusStyles[booking.status],
-                    )}
+                    aria-label={`Status for ${booking.reference}`}
+                    className={statusSelectClass(booking.status)}
                   >
                     {statusOptions.map((s) => (
-                      <option key={s} value={s} className="bg-background text-foreground">
+                      <option
+                        key={s}
+                        value={s}
+                        className="bg-background text-foreground"
+                      >
                         {s}
                       </option>
                     ))}

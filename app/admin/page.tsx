@@ -66,15 +66,44 @@ export default function AdminOverviewPage() {
           </h2>
           <Link
             href="/admin/bookings"
-            className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
           >
             View all
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm">
+        {/* Mobile / tablet: cards */}
+        <div className="grid gap-3 p-4 md:hidden">
+          {recent.map((booking) => (
+            <div
+              key={booking.id}
+              className="rounded-xl border border-border bg-background p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span className="font-medium text-foreground">
+                  {booking.customerName}
+                </span>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${bookingStatusStyles[booking.status]}`}
+                >
+                  {booking.status}
+                </span>
+              </div>
+              <div className="mt-1 text-sm text-muted-foreground">
+                {booking.tourTitle}
+              </div>
+              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                <span className="font-mono">{booking.reference}</span>
+                <span>{formatDate(booking.date)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden md:block">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="px-5 py-3 font-medium">Reference</th>
@@ -88,7 +117,7 @@ export default function AdminOverviewPage() {
               {recent.map((booking) => (
                 <tr
                   key={booking.id}
-                  className="border-b border-border last:border-0 transition-colors hover:bg-muted/40"
+                  className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
                 >
                   <td className="px-5 py-3 font-mono text-xs text-muted-foreground">
                     {booking.reference}

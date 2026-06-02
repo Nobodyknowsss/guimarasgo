@@ -323,6 +323,53 @@ export const adminCustomers: AdminCustomer[] = [
   },
 ];
 
+export interface AdminRating {
+  id: string;
+  tourSlug: string;
+  tourTitle: string;
+  categoryLabel: string;
+  author: string;
+  /** 1–5 stars. */
+  rating: number;
+  comment: string;
+  /** When the review was left (ISO). */
+  createdAt: string;
+}
+
+export const adminRatings: AdminRating[] = [
+  {
+    id: "1",
+    tourSlug: "classic-7-island-hopping",
+    tourTitle: "Classic 7-Island Hopping",
+    categoryLabel: "Island Hopping",
+    author: "Maria Santos",
+    rating: 5,
+    comment:
+      "Unforgettable day — our boatman knew exactly which coves were quietest. Lunch on the boat was a highlight.",
+    createdAt: "2026-05-28",
+  },
+  {
+    id: "2",
+    tourSlug: "sunset-firefly-cruise",
+    tourTitle: "Sunset & Firefly Cruise",
+    categoryLabel: "Island Hopping",
+    author: "David Lim",
+    rating: 4,
+    comment: "Beautiful golden hour and the fireflies were magical. Bring repellent!",
+    createdAt: "2026-05-26",
+  },
+  {
+    id: "3",
+    tourSlug: "snorkel-reef-half-day",
+    tourTitle: "Snorkel & Reef Half-Day",
+    categoryLabel: "Island Hopping",
+    author: "Grace Tan",
+    rating: 5,
+    comment: "Great reef spots and the in-water guide pointed out so much. Perfect half day.",
+    createdAt: "2026-05-22",
+  },
+];
+
 /** All listings across the three tour types, aggregated from the live catalog. */
 export const adminListings: AdminListing[] = [
   ...islandHoppingTours.map((tour) => ({
@@ -370,9 +417,17 @@ export const adminListings: AdminListing[] = [
 ];
 
 export const tourCategoryOptions = [
-  { slug: islandHoppingMeta.slug, label: islandHoppingMeta.label },
-  { slug: dayToursMeta.slug, label: dayToursMeta.label },
-  { slug: motorcycleRentalsMeta.slug, label: motorcycleRentalsMeta.label },
+  {
+    slug: islandHoppingMeta.slug,
+    label: islandHoppingMeta.label,
+    icon: islandHoppingMeta.icon,
+  },
+  { slug: dayToursMeta.slug, label: dayToursMeta.label, icon: dayToursMeta.icon },
+  {
+    slug: motorcycleRentalsMeta.slug,
+    label: motorcycleRentalsMeta.label,
+    icon: motorcycleRentalsMeta.icon,
+  },
 ];
 
 export function getAdminStats() {

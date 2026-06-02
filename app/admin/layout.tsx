@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ExternalLink, Info } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 import { AdminSidebar, AdminMobileNav } from "@/components/admin/admin-nav";
 import { AdminThemeToggle } from "@/components/admin/admin-theme-toggle";
@@ -46,15 +46,6 @@ export default function AdminLayout({
         </header>
 
         <AdminMobileNav />
-
-        <div className="flex items-start gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300 sm:px-6">
-          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          <p>
-            Demo dashboard — data shown is sample only. Adding, editing, and status
-            changes are visual previews and aren&apos;t saved yet (no backend
-            connected).
-          </p>
-        </div>
 
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>

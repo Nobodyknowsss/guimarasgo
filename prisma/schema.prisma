@@ -27,7 +27,7 @@ model island_hopping_listings {
   category      String
   location      String
   title         String
-  photos        Json     @default("[]")
+  photos        String[] @default([])
   price         Int
   price_unit    String
   max_per_day   Int
@@ -40,7 +40,7 @@ model island_hopping_listings {
   updated_at    DateTime @db.Timestamptz(6)
 }
 
-enum UserRole {on the im
+enum UserRole {
   ADMIN
   CUSTOMER
   @@map("user_role")

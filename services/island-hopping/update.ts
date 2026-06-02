@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { publicPhotoUrl } from "@/lib/supabase/storage";
 import {
   IslandHoppingListingSchema,
   type CreateIslandHoppingListing,
@@ -20,10 +21,11 @@ export async function updateIslandHoppingListing(
     where: { id },
     data: {
       ...input,
-      photos: input.photos as never,
       updated_at: new Date(),
     },
   });
 
-  return IslandHoppingListingSchema.parse(row);
+  const listing = IslandHoppingListingSchema.parse(row);
+  // Stored as paths; return displayable URLs.
+  return { ...listing, photos: listing.photos.map(publicPhotoUrl) };
 }

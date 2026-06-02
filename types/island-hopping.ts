@@ -1,16 +1,15 @@
 import { z } from "zod";
 
-export const PhotoSchema = z.object({
-  url: z.string(),
-  publicId: z.string(),
-});
-
+// Photos are stored as an array of Supabase Storage *paths* (relative to the
+// island-hopping bucket), e.g. "abc123.jpg". On read, the services map each path
+// to its public URL via lib/supabase/storage.publicPhotoUrl — so this same
+// `photos` field carries paths going in (create/update) and URLs coming out (get).
 export const IslandHoppingListingSchema = z.object({
   id: z.string().uuid(),
   category: z.string(),
   location: z.string(),
   title: z.string(),
-  photos: z.array(PhotoSchema),
+  photos: z.array(z.string()),
   price: z.number().int().positive(),
   price_unit: z.string(),
   max_per_day: z.number().int().positive(),
@@ -29,6 +28,5 @@ export const CreateIslandHoppingListingSchema = IslandHoppingListingSchema.omit(
   updated_at: true,
 });
 
-export type Photo = z.infer<typeof PhotoSchema>;
 export type IslandHoppingListing = z.infer<typeof IslandHoppingListingSchema>;
 export type CreateIslandHoppingListing = z.infer<typeof CreateIslandHoppingListingSchema>;

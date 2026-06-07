@@ -6,7 +6,11 @@ import { AdminPageHeader } from "@/components/admin/stat-card";
 import { tourCategoryOptions } from "@/lib/admin/data";
 
 // Which category forms are built so far.
-const available = new Set<string>(["island-hopping"]);
+const available = new Set<string>([
+  "island-hopping",
+  "day-tours",
+  "motorcycle-rentals",
+]);
 
 const descriptions: Record<string, string> = {
   "island-hopping": "Boat trips priced per person.",

@@ -12,7 +12,7 @@ type Status = "uploading" | "done" | "error";
 
 interface UploadImage {
   id: string;
-  localUrl: string; // objectURL for the instant preview
+  localUrl: string; // objectURL (new pick) or remote URL (edit-mode seed)
   name: string;
   status: Status;
   path?: string; // storage path, set on success — this is what the listing stores
@@ -21,25 +21,49 @@ interface UploadImage {
 }
 
 interface ImageUploaderProps {
+  /** Photos POST endpoint, e.g. /api/day-tours/photos. */
+  endpoint: string;
   max?: number;
+  /** Existing photos to seed in edit mode (already-uploaded path + public url). */
+  initial?: { path: string; url: string }[];
   /** Fires whenever the set of successfully-uploaded photo paths changes. */
   onChange?: (paths: string[]) => void;
 }
 
-// Uploads each chosen file to /api/island-hopping/photos as it's picked: shows an
-// instant local preview, then a spinner, then a confirmed preview (or an error).
-// The uploaded storage paths are reported via onChange and mirrored into hidden
-// `photos` inputs so a native form submit picks them up too.
-export function ImageUploader({ max = 6, onChange }: ImageUploaderProps) {
-  const [images, setImages] = useState<UploadImage[]>([]);
+function isObjectUrl(url: string): boolean {
+  return url.startsWith("blob:");
+}
+
+// Uploads each chosen file to `endpoint` as it's picked: shows an instant local
+// preview, then a spinner, then a confirmed preview (or an error). The uploaded
+// storage paths are reported via onChange. In edit mode it is pre-seeded with the
+// listing's existing photos so they are kept on save unless removed.
+export function ImageUploader({
+  endpoint,
+  max = 6,
+  initial,
+  onChange,
+}: ImageUploaderProps) {
+  const [images, setImages] = useState<UploadImage[]>(() =>
+    (initial ?? []).map((p) => ({
+      id: p.path,
+      localUrl: p.url,
+      name: p.path,
+      status: "done" as const,
+      path: p.path,
+      remoteUrl: p.url,
+    })),
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Revoke every objectURL on unmount.
+  // Revoke every objectURL on unmount (skip remote URLs seeded in edit mode).
   const imagesRef = useRef(images);
   imagesRef.current = images;
   useEffect(
     () => () =>
-      imagesRef.current.forEach((img) => URL.revokeObjectURL(img.localUrl)),
+      imagesRef.current.forEach((img) => {
+        if (isObjectUrl(img.localUrl)) URL.revokeObjectURL(img.localUrl);
+      }),
     [],
   );
 
@@ -63,10 +87,7 @@ export function ImageUploader({ max = 6, onChange }: ImageUploaderProps) {
     const form = new FormData();
     form.append("file", file);
     try {
-      const res = await fetch("/api/island-hopping/photos", {
-        method: "POST",
-        body: form,
-      });
+      const res = await fetch(endpoint, { method: "POST", body: form });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         patch(id, { status: "error", error: data.error ?? "Upload failed." });
@@ -110,7 +131,7 @@ export function ImageUploader({ max = 6, onChange }: ImageUploaderProps) {
   function remove(id: string) {
     setImages((prev) => {
       const img = prev.find((i) => i.id === id);
-      if (img) URL.revokeObjectURL(img.localUrl);
+      if (img && isObjectUrl(img.localUrl)) URL.revokeObjectURL(img.localUrl);
       return prev.filter((i) => i.id !== id);
     });
   }
@@ -162,11 +183,6 @@ export function ImageUploader({ max = 6, onChange }: ImageUploaderProps) {
             >
               <X className="h-3.5 w-3.5" />
             </button>
-
-            {/* Native-form fallback: include the saved path on submit. */}
-            {img.status === "done" && img.path ? (
-              <input type="hidden" name="photos" value={img.path} />
-            ) : null}
           </div>
         ))}
 

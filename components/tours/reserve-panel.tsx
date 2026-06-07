@@ -13,7 +13,8 @@ export function ReservePanel({
 }: {
   price: number;
   priceUnit: string;
-  rating: number;
+  /** Optional average rating. Omit to hide the rating chip. */
+  rating?: number;
   reserveHref: string;
   /** The reservation fee for this tour's category, in PHP. */
   fee: number;
@@ -31,10 +32,12 @@ export function ReservePanel({
               </span>
             </p>
           </div>
-          <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            {rating}
-          </span>
+          {rating !== undefined ? (
+            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+              {rating}
+            </span>
+          ) : null}
         </div>
 
         <Link

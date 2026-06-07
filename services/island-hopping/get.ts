@@ -1,15 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { publicPhotoUrl } from "@/lib/supabase/storage";
 import {
   IslandHoppingListingSchema,
   type IslandHoppingListing,
 } from "@/types/island-hopping";
 
-// Stored photos are storage paths; callers want displayable URLs, so map on read.
-function withPhotoUrls(listing: IslandHoppingListing): IslandHoppingListing {
-  return { ...listing, photos: listing.photos.map(publicPhotoUrl) };
-}
-
+// Services return the raw row: `photos` carries storage PATHS. Map them to public
+// URLs at the read edge with withPublicPhotos (see lib/supabase/storage).
 export async function getIslandHoppingListings(): Promise<
   IslandHoppingListing[]
 > {
@@ -17,7 +13,7 @@ export async function getIslandHoppingListings(): Promise<
     orderBy: { created_at: "asc" },
   });
 
-  return rows.map((row) => withPhotoUrls(IslandHoppingListingSchema.parse(row)));
+  return rows.map((row) => IslandHoppingListingSchema.parse(row));
 }
 
 export async function getIslandHoppingListingById(
@@ -29,5 +25,5 @@ export async function getIslandHoppingListingById(
 
   if (!row) return null;
 
-  return withPhotoUrls(IslandHoppingListingSchema.parse(row));
+  return IslandHoppingListingSchema.parse(row);
 }

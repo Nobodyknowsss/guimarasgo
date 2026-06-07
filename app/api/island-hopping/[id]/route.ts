@@ -6,6 +6,7 @@ import { getIslandHoppingListingById } from "@/services/island-hopping/get";
 import { updateIslandHoppingListing } from "@/services/island-hopping/update";
 import { deleteIslandHoppingListing } from "@/services/island-hopping/delete";
 import { CreateIslandHoppingListingSchema } from "@/types/island-hopping";
+import { ISLAND_HOPPING_BUCKET, withPublicPhotos } from "@/lib/supabase/storage";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -18,7 +19,9 @@ export async function GET(_request: Request, { params }: RouteParams) {
     if (!listing) {
       return NextResponse.json({ error: "Not found." }, { status: 404 });
     }
-    return NextResponse.json({ data: listing });
+    return NextResponse.json({
+      data: withPublicPhotos(ISLAND_HOPPING_BUCKET, listing),
+    });
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch listing." },
@@ -62,7 +65,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
     if (!listing) {
       return NextResponse.json({ error: "Not found." }, { status: 404 });
     }
-    return NextResponse.json({ data: listing });
+    return NextResponse.json({
+      data: withPublicPhotos(ISLAND_HOPPING_BUCKET, listing),
+    });
   } catch {
     return NextResponse.json(
       { error: "Failed to update listing." },

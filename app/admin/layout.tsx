@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
@@ -15,7 +16,11 @@ export default function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="min-h-svh bg-muted/20">
-      <AdminSidebar />
+      {/* Nav uses usePathname (dynamic on [id] routes); keep it out of the
+          partial-prerender shell so dynamic admin routes can still build. */}
+      <Suspense fallback={null}>
+        <AdminSidebar />
+      </Suspense>
 
       <div className="lg:pl-60">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/85 px-4 backdrop-blur-md sm:px-6">
@@ -45,7 +50,9 @@ export default function AdminLayout({
           </div>
         </header>
 
-        <AdminMobileNav />
+        <Suspense fallback={null}>
+          <AdminMobileNav />
+        </Suspense>
 
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>

@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
+import { Suspense } from "react";
 import Link from "next/link";
-import { MapPin, Star, Gauge, ArrowLeft, ArrowRight } from "lucide-react";
+import { MapPin, Gauge, ArrowLeft, ArrowRight } from "lucide-react";
 
 import { SiteHeader } from "@/components/landing/site-header";
 import { SiteFooter } from "@/components/landing/site-footer";
-import { Badge } from "@/components/ui/badge";
-import { badgeStyles } from "@/lib/tours/shared";
+import { TourCover } from "@/components/tours/tour-cover";
+import { SectionLoading } from "@/components/tours/section-loading";
+import { motorcycleRentalsMeta } from "@/lib/tours/motorcycle-rentals";
+import { getMotorcycleRentalListings } from "@/services/motorcycle-rentals/get";
 import {
-  motorcycleRentalsMeta,
-  motorcycleRentals,
-} from "@/lib/tours/motorcycle-rentals";
+  MOTORCYCLE_RENTALS_BUCKET,
+  publicPhotoUrl,
+} from "@/lib/supabase/storage";
 
 export const metadata: Metadata = {
   title: `${motorcycleRentalsMeta.label} — GuimarasGo`,
@@ -17,6 +21,82 @@ export const metadata: Metadata = {
 };
 
 const Icon = motorcycleRentalsMeta.icon;
+
+// Specs are stored flattened as "Label: Value"; show just the value in the chip.
+function specValue(spec: string): string {
+  const i = spec.indexOf(":");
+  return i === -1 ? spec : spec.slice(i + 1).trim();
+}
+
+async function Listings() {
+  await connection();
+  const listings = await getMotorcycleRentalListings();
+
+  if (listings.length === 0) {
+    return (
+      <p className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-12 text-center text-muted-foreground">
+        No bikes are listed just yet — check back soon.
+      </p>
+    );
+  }
+
+  return (
+    <div className="grid gap-6 sm:grid-cols-2">
+      {listings.map((rental) => {
+        const cover = rental.photos[0]
+          ? publicPhotoUrl(MOTORCYCLE_RENTALS_BUCKET, rental.photos[0])
+          : null;
+        return (
+          <Link
+            key={rental.id}
+            href={`/tours/motorcycle-rentals/${rental.id}`}
+            className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+          >
+            <div className="relative aspect-[16/9] overflow-hidden">
+              <TourCover photo={cover} title={rental.title} icon={Icon} />
+            </div>
+            <div className="flex flex-1 flex-col p-6">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5" />
+                {rental.location}
+              </div>
+              <h3 className="mt-2 text-xl font-semibold text-foreground transition-colors group-hover:text-primary">
+                {rental.title}
+              </h3>
+              <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+                {rental.description}
+              </p>
+
+              <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <span className="text-xs text-muted-foreground">from</span>
+                  <p className="text-xl font-bold text-foreground">
+                    ₱{rental.price.toLocaleString()}
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                      / {rental.price_unit}
+                    </span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  {rental.specs[0] ? (
+                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                      <Gauge className="h-3.5 w-3.5" />
+                      {specValue(rental.specs[0])}
+                    </span>
+                  ) : null}
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors group-hover:text-primary">
+                    More Details
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function MotorcycleRentalsPage() {
   return (
@@ -51,67 +131,9 @@ export default function MotorcycleRentalsPage() {
 
         <section className="py-16 sm:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-6 sm:grid-cols-2">
-              {motorcycleRentals.map((rental) => (
-                <Link
-                  key={rental.slug}
-                  href={`/tours/motorcycle-rentals/${rental.slug}`}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
-                >
-                  <div
-                    className={`relative aspect-[16/9] overflow-hidden bg-gradient-to-br ${rental.gradient}`}
-                  >
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.25),transparent_60%)]" />
-                    {rental.badge ? (
-                      <Badge
-                        className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold shadow-md ${badgeStyles[rental.badge]}`}
-                      >
-                        {rental.badge}
-                      </Badge>
-                    ) : null}
-                    <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm">
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      {rental.rating}
-                      <span className="text-muted-foreground">({rental.reviews})</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-1 flex-col p-6">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {rental.location}
-                    </div>
-                    <h3 className="mt-2 text-xl font-semibold text-foreground transition-colors group-hover:text-primary">
-                      {rental.title}
-                    </h3>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
-                      {rental.shortDescription}
-                    </p>
-
-                    <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-end sm:justify-between">
-                      <div>
-                        <span className="text-xs text-muted-foreground">from</span>
-                        <p className="text-xl font-bold text-foreground">
-                          ₱{rental.pricePerDay.toLocaleString()}
-                          <span className="ml-1 text-xs font-normal text-muted-foreground">
-                            / {motorcycleRentalsMeta.priceUnit}
-                          </span>
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                          <Gauge className="h-3.5 w-3.5" />
-                          {rental.specs[0]?.value ?? "Per day"}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors group-hover:text-primary">
-                          More Details
-                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <Suspense fallback={<SectionLoading />}>
+              <Listings />
+            </Suspense>
           </div>
         </section>
       </main>

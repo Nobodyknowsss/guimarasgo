@@ -5,13 +5,16 @@ import { requireAdmin } from "@/lib/auth/require-admin";
 import { getIslandHoppingListings } from "@/services/island-hopping/get";
 import { createIslandHoppingListing } from "@/services/island-hopping/create";
 import { CreateIslandHoppingListingSchema } from "@/types/island-hopping";
+import { ISLAND_HOPPING_BUCKET, withPublicPhotos } from "@/lib/supabase/storage";
 
 export async function GET() {
   await connection();
 
   try {
     const listings = await getIslandHoppingListings();
-    return NextResponse.json({ data: listings });
+    return NextResponse.json({
+      data: listings.map((l) => withPublicPhotos(ISLAND_HOPPING_BUCKET, l)),
+    });
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch listings." },
@@ -51,7 +54,10 @@ export async function POST(request: Request) {
 
   try {
     const listing = await createIslandHoppingListing(parsed.data);
-    return NextResponse.json({ data: listing }, { status: 201 });
+    return NextResponse.json(
+      { data: withPublicPhotos(ISLAND_HOPPING_BUCKET, listing) },
+      { status: 201 },
+    );
   } catch {
     return NextResponse.json(
       { error: "Failed to create listing." },

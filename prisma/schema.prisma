@@ -32,12 +32,55 @@ model island_hopping_listings {
   price_unit    String
   max_per_day   Int
   description   String
+  duration      String   @default("")
   highlights    String[] @default([])
   islands       String[] @default([])
   included      String[] @default([])
   meeting_point String
+  good_to_know  String[] @default([])
   created_at    DateTime @default(now()) @db.Timestamptz(6)
   updated_at    DateTime @db.Timestamptz(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model day_tour_listings {
+  id           String   @id @db.Uuid
+  category     String
+  location     String
+  title        String
+  photos       String[] @default([])
+  price        Int
+  price_unit   String
+  max_per_day  Int
+  description  String
+  duration     String
+  highlights   String[] @default([])
+  stops        String[] @default([])
+  included     String[] @default([])
+  pickup       String
+  good_to_know String[] @default([])
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @db.Timestamptz(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model motorcycle_rental_listings {
+  id           String   @id @db.Uuid
+  category     String
+  location     String
+  title        String
+  photos       String[] @default([])
+  price        Int
+  price_unit   String
+  max_per_day  Int
+  description  String
+  specs        String[] @default([])
+  highlights   String[] @default([])
+  included     String[] @default([])
+  delivery     String
+  rental_terms String[] @default([])
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @db.Timestamptz(6)
 }
 
 enum UserRole {

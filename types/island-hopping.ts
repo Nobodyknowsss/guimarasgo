@@ -14,10 +14,12 @@ export const IslandHoppingListingSchema = z.object({
   price_unit: z.string(),
   max_per_day: z.number().int().positive(),
   description: z.string(),
+  duration: z.string(),
   highlights: z.array(z.string()),
   islands: z.array(z.string()),
   included: z.array(z.string()),
   meeting_point: z.string(),
+  good_to_know: z.array(z.string()),
   created_at: z.date(),
   updated_at: z.date(),
 });

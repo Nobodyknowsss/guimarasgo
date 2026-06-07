@@ -13,7 +13,7 @@ const navLinks = [
   { href: "/#tours", label: "Tours" },
   { href: "/#discover", label: "Discover" },
   { href: "/#how-it-works", label: "How it works" },
-  { href: "/#about", label: "About" },
+  { href: "/#about", label: "Contact" },
 ];
 
 export function SiteHeader() {

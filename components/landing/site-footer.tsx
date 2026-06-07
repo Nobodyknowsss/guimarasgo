@@ -15,9 +15,8 @@ const linkColumns = [
   {
     heading: "Company",
     links: [
-      { label: "About", href: "#about" },
       { label: "How it works", href: "#how-it-works" },
-      { label: "Contact", href: "#" },
+      { label: "Contact", href: "#about" },
     ],
   },
   {

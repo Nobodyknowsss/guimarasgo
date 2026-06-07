@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { ThemeProvider } from "next-themes";
 
 import { AdminSidebar, AdminMobileNav } from "@/components/admin/admin-nav";
 import { AdminThemeToggle } from "@/components/admin/admin-theme-toggle";
@@ -15,6 +16,7 @@ export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
     <div className="min-h-svh bg-muted/20">
       {/* Nav uses usePathname (dynamic on [id] routes); keep it out of the
           partial-prerender shell so dynamic admin routes can still build. */}
@@ -57,5 +59,6 @@ export default function AdminLayout({
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
+    </ThemeProvider>
   );
 }

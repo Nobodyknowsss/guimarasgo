@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { AdminPageHeader } from "@/components/admin/stat-card";
@@ -21,14 +21,6 @@ const descriptions: Record<string, string> = {
 export default function NewTourChooserPage() {
   return (
     <div className="space-y-6">
-      <Link
-        href="/admin/tours"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Back to tours
-      </Link>
-
       <AdminPageHeader
         title="Add tour"
         description="Choose the type of listing to create."

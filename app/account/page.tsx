@@ -14,12 +14,6 @@ export default function AccountPage() {
       <SiteHeader />
       <main className="min-h-svh bg-muted/30 pt-24 pb-16">
         <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="text-sm text-muted-foreground transition-colors hover:text-primary"
-          >
-            ← Back to home
-          </Link>
           <div className="mt-6">
             <Suspense fallback={<AccountFormFallback />}>
               <AccountFormLoader />

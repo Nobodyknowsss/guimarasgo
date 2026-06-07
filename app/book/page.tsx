@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { CalendarCheck, ArrowLeft } from "lucide-react";
+import { CalendarCheck } from "lucide-react";
 
 import { SiteHeader } from "@/components/landing/site-header";
 import { SiteFooter } from "@/components/landing/site-footer";
@@ -13,14 +13,6 @@ export default function BookPage() {
       <SiteHeader />
       <main className="min-h-svh bg-muted/30 pt-24 pb-16">
         <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/#tours"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to all categories
-          </Link>
-
           <Suspense fallback={<BookCardFallback />}>
             <BookCard />
           </Suspense>

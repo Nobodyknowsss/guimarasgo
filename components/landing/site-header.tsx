@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Menu, Moon, Sun, X } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { HeaderAuthMenu } from "@/components/header-auth-menu";
@@ -19,21 +18,16 @@ const navLinks = [
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const isHome = pathname === "/";
 
   useEffect(() => {
-    setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const isDark = (theme === "system" ? "dark" : theme) === "dark";
   // Transparent-on-hero styling only applies on the home page (which has the hero image).
   const onHero = isHome && !scrolled;
 
@@ -81,34 +75,6 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-1.5">
           <HeaderAuthMenu onHero={onHero} />
-
-          <button
-            type="button"
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            aria-label={
-              mounted
-                ? isDark
-                  ? "Switch to light theme"
-                  : "Switch to dark theme"
-                : "Toggle theme"
-            }
-            className={cn(
-              "grid h-9 w-9 cursor-pointer place-items-center rounded-full transition-colors",
-              onHero
-                ? "text-white hover:bg-white/15"
-                : "text-foreground/80 hover:bg-muted hover:text-foreground",
-            )}
-          >
-            {mounted ? (
-              isDark ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )
-            ) : (
-              <span className="h-4 w-4" aria-hidden />
-            )}
-          </button>
 
           <button
             type="button"

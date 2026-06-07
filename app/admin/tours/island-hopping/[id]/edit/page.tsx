@@ -1,8 +1,6 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 
 import { AdminPageHeader } from "@/components/admin/stat-card";
 import { IslandHoppingForm } from "@/components/admin/island-hopping-form";
@@ -59,14 +57,6 @@ async function EditBody({ params }: PageProps) {
 export default function EditIslandHoppingPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
-      <Link
-        href="/admin/tours"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Back to tours
-      </Link>
-
       <Suspense fallback={<SectionLoading />}>
         <EditBody params={params} />
       </Suspense>

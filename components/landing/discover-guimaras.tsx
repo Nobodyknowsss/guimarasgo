@@ -70,7 +70,7 @@ export function DiscoverGuimaras() {
 
         {/* Marquee, kept within the content width so it has space on both sides.
             The mask softly fades cards at the edges; pauses on press/hover. */}
-        <div className="mt-12 overflow-hidden py-3 [-webkit-mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)] [mask-image:linear-gradient(to_right,transparent,#000_4%,#000_96%,transparent)]">
+        <div className="mt-12 overflow-hidden py-3">
           <div
             className="gg-marquee flex w-max select-none"
             data-paused={paused}
@@ -78,8 +78,6 @@ export function DiscoverGuimaras() {
             onPointerUp={() => setPaused(false)}
             onPointerCancel={() => setPaused(false)}
             onPointerLeave={() => setPaused(false)}
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
           >
             {loop.map((d, i) => (
               <article

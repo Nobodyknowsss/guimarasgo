@@ -249,13 +249,6 @@ export default function BookingsPage() {
       <SiteHeader />
       <main className="min-h-svh bg-muted/30 pt-24 pb-16">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="text-sm text-muted-foreground transition-colors hover:text-primary"
-          >
-            ← Back to home
-          </Link>
-
           <Suspense fallback={<BookingsFallback />}>
             <BookingsList />
           </Suspense>

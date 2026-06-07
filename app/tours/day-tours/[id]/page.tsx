@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
   MapPin,
   Users,
   Check,
@@ -51,14 +50,6 @@ async function DetailBody({ params }: PageProps) {
   return (
     <main className="bg-muted/30 pb-16">
       <div className="mx-auto max-w-5xl px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8">
-        <Link
-          href="/tours/day-tours"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to {dayToursMeta.label}
-        </Link>
-
         <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-2xl shadow-sm sm:aspect-[21/9]">
           <TourCover photo={cover} title={tour.title} icon={Icon} />
         </div>

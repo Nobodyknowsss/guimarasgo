@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import Link from "next/link";
-import { MapPin, Users, ArrowLeft, ArrowRight } from "lucide-react";
+import { MapPin, Users, ArrowRight } from "lucide-react";
 
 import { SiteHeader } from "@/components/landing/site-header";
 import { SiteFooter } from "@/components/landing/site-footer";
@@ -96,13 +96,6 @@ export default function IslandHoppingPage() {
       <main>
         <section className="bg-muted/30 pt-24 pb-12 sm:pt-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Link
-              href="/#tours"
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              Back to all categories
-            </Link>
             <div className="mt-6 flex items-center gap-3">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" />

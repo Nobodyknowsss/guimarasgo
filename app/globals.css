@@ -87,3 +87,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Looping horizontal marquee (destinations strip). The track holds two copies of
+   the content and slides by 50% so it repeats seamlessly. Pausable via the
+   data-paused attribute, and disabled for reduced-motion users. */
+@keyframes gg-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.gg-marquee {
+  animation: gg-marquee 45s linear infinite;
+}
+
+.gg-marquee[data-paused="true"] {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gg-marquee {
+    animation: none;
+  }
+}

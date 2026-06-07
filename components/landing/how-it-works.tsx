@@ -1,10 +1,10 @@
+import Image from "next/image";
 import {
   Search,
   CreditCard,
   Smile,
   MapPin,
   CalendarCheck,
-  Sailboat,
   ShieldCheck,
   Clock,
   CheckCircle2,
@@ -149,10 +149,12 @@ function StepArt({ visual }: { visual: StepVisual }) {
     return (
       <VisualFrame>
         <div className="relative rounded-3xl border border-border bg-card p-2.5 shadow-xl shadow-sky-900/10">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600">
-            <Sailboat
-              className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 text-white/70"
-              strokeWidth={1.5}
+          <div className="relative aspect-[16/10] overflow-hidden rounded-2xl">
+            <Image
+              src="/island-hopping-placeholder.webp"
+              alt="Island hopping in Guimaras"
+              fill
+              className="object-cover"
             />
             <span className="absolute left-3 top-3 rounded-full bg-white/20 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-md">
               Island Hopping
@@ -161,7 +163,7 @@ function StepArt({ visual }: { visual: StepVisual }) {
           <div className="flex items-center justify-between px-2.5 py-3">
             <div>
               <p className="text-sm font-semibold text-foreground">
-                Ave Maria &amp; Natago
+                Adlobijod &amp; Natago
               </p>
               <p className="text-xs text-muted-foreground">
                 Full day · local crew
@@ -175,7 +177,7 @@ function StepArt({ visual }: { visual: StepVisual }) {
 
         <FloatChip
           icon={MapPin}
-          label="3 islands"
+          label="2 islands"
           className="-left-3 top-1/3 sm:-left-5"
         />
         <FloatChip

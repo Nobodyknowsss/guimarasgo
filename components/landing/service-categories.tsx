@@ -7,10 +7,9 @@ const services = [
     icon: Sailboat,
     title: "Island Hopping",
     description:
-      "Hop between Guimaras' best-kept islands — Ave Maria, Natago, and Turtle Island — guided by GuimarasGo's local crew who know every cove.",
+      "Hop between Guimaras' best-kept islands — Adlobijod, Natago, and Turtle Island — guided by GuimarasGo's local crew who know every cove.",
     tag: "From ₱350 per person",
-    image:
-      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&q=80&auto=format&fit=crop",
+    image: "/category/island-hopping.webp",
     imageAlt: "Wooden bangka boat anchored on turquoise tropical water",
     href: "/tours/island-hopping",
   },
@@ -20,8 +19,7 @@ const services = [
     description:
       "Land tours with a driver/guide — Trappist Monastery, Guisi Lighthouse, mango plantations, and the island's hidden viewpoints.",
     tag: "From ₱1,200 per group",
-    image:
-      "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=1200&q=80&auto=format&fit=crop",
+    image: "/category/day-tours.webp",
     imageAlt: "Coastal lighthouse on a cliff overlooking the sea",
     href: "/tours/day-tours",
   },
@@ -31,8 +29,7 @@ const services = [
     description:
       "Explore Guimaras at your own pace. Well-maintained scooters and adventure bikes, delivered to your accommodation.",
     tag: "From ₱400 per day",
-    image:
-      "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=1200&q=80&auto=format&fit=crop",
+    image: "/category/motorcycle-rentals.webp",
     imageAlt: "Vintage Vespa scooter parked by a tropical roadside",
     href: "/tours/motorcycle-rentals",
   },

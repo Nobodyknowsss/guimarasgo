@@ -4,9 +4,9 @@ import { ArrowRight, Sailboat, Sun, Bike } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const serviceChips = [
-  { href: "#tours", label: "Island Hopping", icon: Sailboat },
-  { href: "#tours", label: "Day Tours", icon: Sun },
-  { href: "#tours", label: "Motorcycle Rentals", icon: Bike },
+  { href: "/tours", label: "Island Hopping", icon: Sailboat },
+  { href: "/tours", label: "Day Tours", icon: Sun },
+  { href: "/tours", label: "Motorcycle Rentals", icon: Bike },
 ];
 
 export function Hero() {
@@ -39,8 +39,8 @@ export function Hero() {
         </h1>
 
         <p className="mt-6 max-w-xl text-pretty text-base text-white/85 sm:text-lg">
-          Island-hopping, day tours, and motorcycle rentals — all locally run
-          by GuimarasGo. Reserve your spot with a small fee, pay the rest on
+          Island-hopping, day tours, and motorcycle rentals — all locally run by
+          GuimarasGo. Reserve your spot with a small fee, pay the rest on
           arrival.
         </p>
 
@@ -50,7 +50,7 @@ export function Hero() {
             size="lg"
             className="group h-12 cursor-pointer bg-white px-7 text-base text-primary shadow-lg shadow-black/20 transition-all hover:bg-white/95 hover:shadow-xl hover:shadow-black/30"
           >
-            <Link href="#tours">
+            <Link href="/tours">
               Explore tours
               <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>

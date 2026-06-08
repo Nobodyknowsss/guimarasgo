@@ -11,7 +11,7 @@ const services = [
     tag: "From ₱350 per person",
     image: "/category/island-hopping.webp",
     imageAlt: "Wooden bangka boat anchored on turquoise tropical water",
-    href: "/tours/island-hopping",
+    href: "/tours",
   },
   {
     icon: Sun,
@@ -21,7 +21,7 @@ const services = [
     tag: "From ₱1,200 per group",
     image: "/category/day-tours.webp",
     imageAlt: "Coastal lighthouse on a cliff overlooking the sea",
-    href: "/tours/day-tours",
+    href: "/tours",
   },
   {
     icon: Bike,
@@ -31,7 +31,7 @@ const services = [
     tag: "From ₱400 per day",
     image: "/category/motorcycle-rentals.webp",
     imageAlt: "Vintage Vespa scooter parked by a tropical roadside",
-    href: "/tours/motorcycle-rentals",
+    href: "/tours",
   },
 ];
 

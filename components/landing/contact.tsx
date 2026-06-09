@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { Phone, Facebook, MessageCircle, ArrowUpRight } from "lucide-react";
+import { Mail, Facebook, MessageCircle, ArrowUpRight } from "lucide-react";
 
-// NOTE: placeholders — swap in GuimarasGo's real number & page.
+// NOTE: the Facebook page is a placeholder; swap in GuimarasGo's real page.
 const channels = [
   {
-    icon: Phone,
-    label: "Call or text us",
-    value: "+63 917 000 0000",
-    hint: "Globe / GCash-ready · 8am–8pm daily",
-    href: "tel:+639170000000",
+    icon: Mail,
+    label: "Email us",
+    value: "guimarasgo@gmail.com",
+    hint: "On Philippine time (GMT+8), 8am to 8pm daily",
+    href: "mailto:guimarasgo@gmail.com",
   },
   {
     icon: Facebook,
@@ -34,8 +34,8 @@ export function Contact() {
               Questions? Talk to a local.
             </h2>
             <p className="mt-4 max-w-md text-pretty text-muted-foreground">
-              We&apos;re a small, local team in Guimaras. Message or call us
-              anytime — a real person will get back to you and help you plan the
+              We&apos;re a small, local team in Guimaras. Message or email us
+              anytime, and a real person will get back to you and help you plan the
               perfect trip.
             </p>
             <p className="mt-3 max-w-md text-pretty text-sm text-muted-foreground">

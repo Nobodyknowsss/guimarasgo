@@ -17,8 +17,35 @@ model User {
   firstName String?   @map("first_name")
   lastName  String?   @map("last_name")
   fbLink    String?   @map("fb_link")
+  bookings  Booking[]
 
   @@map("users")
+}
+
+model Booking {
+  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reference  String        @unique
+  userId     String        @map("user_id") @db.Uuid
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Tour-type slug: island-hopping | day-tours | motorcycle-rentals.
+  category   String
+  /// Id of the booked listing row in its per-category table.
+  offeringId String        @map("offering_id") @db.Uuid
+  /// Snapshot of the listing title at booking time (listings can change/be removed).
+  tourTitle  String        @map("tour_title")
+  date       DateTime      @db.Date
+  partySize  Int           @map("party_size")
+  status     BookingStatus @default(CONFIRMED)
+  /// Whether the reservation fee has been paid. False until a payment flow exists.
+  feePaid    Boolean       @default(false) @map("fee_paid")
+  /// Snapshot of the reservation fee for this booking, in PHP.
+  fee        Int
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([userId])
+  @@index([status])
+  @@map("bookings")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -87,4 +114,11 @@ enum UserRole {
   ADMIN
   CUSTOMER
   @@map("user_role")
+}
+
+enum BookingStatus {
+  CONFIRMED
+  PENDING
+  CANCELLED
+  @@map("booking_status")
 }

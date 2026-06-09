@@ -29,7 +29,7 @@ const steps: Step[] = [
     icon: Search,
     title: "Browse & pick your adventure",
     description:
-      "Compare island-hopping trips, day tours, and motorcycle rentals — dates, inclusions, and prices all upfront.",
+      "Compare island-hopping trips, day tours, and motorcycle rentals, with dates, inclusions, and prices all upfront.",
     detail:
       "No inflated marketing, no hidden fees. Just pick the experience that fits your trip.",
     visual: "browse",
@@ -47,7 +47,7 @@ const steps: Step[] = [
     icon: Smile,
     title: "Pay the rest on arrival",
     description:
-      "Settle the remaining balance with us in person on the day — cash or e-wallet, whatever's easiest for you.",
+      "Settle the remaining balance with us in person on the day, cash or e-wallet, whatever's easiest for you.",
     detail:
       "We'll send a confirmation right away, and our local crew will be ready when you arrive.",
     visual: "arrive",
@@ -67,7 +67,7 @@ export function HowItWorks() {
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground">
             No apps, no fine print. Just a clean handshake between you and
-            GuimarasGo — explore, reserve, and go.
+            GuimarasGo: explore, reserve, and go.
           </p>
         </div>
 

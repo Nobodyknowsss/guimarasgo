@@ -1,7 +1,12 @@
+import { Suspense } from "react";
+import { connection } from "next/server";
+import { redirect } from "next/navigation";
 import { Facebook } from "lucide-react";
 
 import { AdminPageHeader } from "@/components/admin/stat-card";
-import { adminCustomers, formatDate } from "@/lib/admin/data";
+import { requireAdmin } from "@/lib/auth/require-admin";
+import { getAdminCustomers } from "@/services/bookings/admin";
+import { formatDate, type AdminCustomer } from "@/lib/admin/data";
 
 export default function AdminCustomersPage() {
   return (
@@ -10,10 +15,43 @@ export default function AdminCustomersPage() {
         title="Customers"
         description="Everyone who has signed up to book with GuimarasGo."
       />
+      <Suspense
+        fallback={<div className="h-64 w-full animate-pulse rounded-2xl bg-muted" />}
+      >
+        <CustomersLoader />
+      </Suspense>
+    </div>
+  );
+}
 
+async function CustomersLoader() {
+  await connection();
+  const auth = await requireAdmin();
+  if (!auth.ok) {
+    redirect(auth.status === 401 ? "/auth/login?next=/admin/customers" : "/");
+  }
+
+  const customers = await getAdminCustomers();
+  return <CustomersView customers={customers} />;
+}
+
+function CustomersView({ customers }: { customers: AdminCustomer[] }) {
+  if (customers.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
+        <p className="text-sm font-medium text-foreground">No customers yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Sign-ups will show up here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <>
       {/* Mobile / tablet: cards */}
       <div className="grid gap-3 sm:grid-cols-2 md:hidden">
-        {adminCustomers.map((customer) => (
+        {customers.map((customer) => (
           <div
             key={customer.id}
             className="rounded-2xl border border-border bg-card p-4 shadow-sm"
@@ -36,7 +74,7 @@ export default function AdminCustomersPage() {
             <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
               <div>
                 <dt className="text-xs text-muted-foreground">Phone</dt>
-                <dd className="text-foreground">{customer.phone}</dd>
+                <dd className="text-foreground">{customer.phone || "—"}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Bookings</dt>
@@ -80,7 +118,7 @@ export default function AdminCustomersPage() {
             </tr>
           </thead>
           <tbody>
-            {adminCustomers.map((customer) => (
+            {customers.map((customer) => (
               <tr
                 key={customer.id}
                 className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
@@ -100,7 +138,7 @@ export default function AdminCustomersPage() {
                   {customer.email}
                 </td>
                 <td className="px-5 py-3 text-muted-foreground">
-                  {customer.phone}
+                  {customer.phone || "—"}
                 </td>
                 <td className="px-5 py-3">
                   {customer.facebook ? (
@@ -123,6 +161,6 @@ export default function AdminCustomersPage() {
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   );
 }

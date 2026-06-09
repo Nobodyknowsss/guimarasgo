@@ -15,14 +15,14 @@ const destinations = [
   {
     name: "Guisi Lighthouse",
     municipality: "Nueva Valencia",
-    blurb: "Spanish-era ruins on a cliff over the Sulu Sea — a sunset legend.",
+    blurb: "Spanish-era ruins on a cliff over the Sulu Sea, a sunset legend.",
     image: "/guimaras-destinations/guisi-lighthouse.webp",
     imageAlt: "Stone lighthouse ruins on a clifftop above the ocean",
   },
   {
     name: "Natago Beach",
     municipality: "Sibunag",
-    blurb: "A hidden bay reachable by boat — perfect for a private picnic.",
+    blurb: "A hidden bay reachable by boat, perfect for a private picnic.",
     image: "/guimaras-destinations/natago-beach.webp",
     imageAlt: "Secluded tropical beach framed by rock formations",
   },
@@ -36,7 +36,7 @@ const destinations = [
   {
     name: "Smallest Plaza",
     municipality: "Jordan",
-    blurb: "Guimaras' charming, famously tiny town plaza — a quirky photo stop.",
+    blurb: "Guimaras' charming, famously tiny town plaza, a quirky photo stop.",
     image: "/guimaras-destinations/smallest-plaza.webp",
     imageAlt: "A very small public plaza with a monument",
   },
@@ -61,7 +61,7 @@ export function DiscoverGuimaras() {
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground">
             An island province of turquoise water, mango orchards, and warm
-            island hospitality — just a 15-minute pumpboat from Iloilo City.
+            island hospitality, just a 15-minute pumpboat from Iloilo City.
           </p>
           <p className="mt-3 text-xs text-muted-foreground/70">
             Press and hold to pause the slideshow.

@@ -7,7 +7,7 @@ const services = [
     icon: Sailboat,
     title: "Island Hopping",
     description:
-      "Hop between Guimaras' best-kept islands — Adlobijod, Natago, and Turtle Island — guided by GuimarasGo's local crew who know every cove.",
+      "Hop between Guimaras' best-kept islands like Adlobijod, Natago, and Turtle Island, guided by GuimarasGo's local crew who know every cove.",
     tag: "From ₱350 per person",
     image: "/category/island-hopping.webp",
     imageAlt: "Wooden bangka boat anchored on turquoise tropical water",
@@ -17,7 +17,7 @@ const services = [
     icon: Sun,
     title: "Day Tours",
     description:
-      "Land tours with a driver/guide — Trappist Monastery, Guisi Lighthouse, mango plantations, and the island's hidden viewpoints.",
+      "Land tours with a driver/guide: Trappist Monastery, Guisi Lighthouse, mango plantations, and the island's hidden viewpoints.",
     tag: "From ₱1,200 per group",
     image: "/category/day-tours.webp",
     imageAlt: "Coastal lighthouse on a cliff overlooking the sea",
@@ -47,7 +47,7 @@ export function ServiceCategories() {
             Three ways to experience the island
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground">
-            Whether you want the sea, the road, or both — pick a category and
+            Whether you want the sea, the road, or both, pick a category and
             book directly with our local crew.
           </p>
         </div>

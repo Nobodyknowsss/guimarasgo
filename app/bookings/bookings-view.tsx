@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import {
   Sailboat,
@@ -12,16 +12,25 @@ import {
   Wallet,
   Zap,
   ShieldCheck,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
 import { TourCover } from "@/components/tours/tour-cover";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-// Bookings have no backing Prisma model yet (the ₱100 reserve flow isn't built —
-// see CLAUDE.md), so `bookings` is always empty for now and the page renders the
-// empty state with the 3 newest listings. These serializable shapes are passed
-// down from the server page; once a Booking model exists, fill `bookings` from a
-// `prisma.booking.findMany({ where: { userId } })` query.
+// Serializable shapes passed down from the server page. `bookings` is loaded from
+// the customer's real Booking rows (prisma.booking.findMany by userId); when they
+// have none, the page renders the empty state with the 3 newest listings.
 export type ServiceKey = "ISLAND_HOPPING" | "DAY_TOUR" | "MOTORCYCLE_RENTAL";
 export type BookingStatus = "UPCOMING" | "COMPLETED";
 
@@ -29,9 +38,13 @@ export type Booking = {
   id: string;
   reference: string;
   service: ServiceKey;
+  /** Listing id, used to link through to the full tour page. */
+  offeringId: string;
   title: string;
   location: string;
   dateLabel: string;
+  /** Number of guests on the booking. */
+  partySize: number;
   status: BookingStatus;
   /** Remaining service price, paid in person on arrival. */
   balance: number;
@@ -74,7 +87,7 @@ const serviceMeta: Record<
 
 const statusStyles: Record<BookingStatus, string> = {
   UPCOMING: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  COMPLETED: "bg-muted text-muted-foreground",
+  COMPLETED: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
 };
 
 type TabKey = "ALL" | ServiceKey;
@@ -142,7 +155,7 @@ function BookingCard({ booking }: { booking: Booking }) {
         </div>
       </div>
 
-      <dl className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-muted/40 px-3 py-2.5">
+      <dl className="mt-4 grid grid-cols-2 gap-2 rounded-xl bg-muted/40 px-3 py-2.5 sm:grid-cols-4">
         <div>
           <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
             Date
@@ -150,6 +163,16 @@ function BookingCard({ booking }: { booking: Booking }) {
           <dd className="mt-0.5 flex items-center gap-1 text-xs font-medium text-foreground">
             <CalendarDays className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
             <span className="truncate">{booking.dateLabel}</span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
+            Guests
+          </dt>
+          <dd className="mt-0.5 flex items-center gap-1 text-xs font-medium text-foreground">
+            <Users className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            {booking.partySize}{" "}
+            {booking.partySize === 1 ? "person" : "people"}
           </dd>
         </div>
         <div>
@@ -177,22 +200,92 @@ function BookingCard({ booking }: { booking: Booking }) {
             ₱{booking.balance.toLocaleString()}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="inline-flex h-9 items-center rounded-full border border-border bg-background px-4 text-xs font-medium text-foreground/80 transition-colors hover:border-primary/50 hover:text-primary"
-          >
-            View Details
-          </button>
-          <button
-            type="button"
-            className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Manage
-          </button>
-        </div>
+        <BookingDetailsDialog booking={booking} />
       </div>
     </article>
+  );
+}
+
+function DetailRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4 py-2.5">
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd className="text-right text-sm font-medium text-foreground">
+        {children}
+      </dd>
+    </div>
+  );
+}
+
+// Full details for a single booking, shown in a modal from "View Details".
+function BookingDetailsDialog({ booking }: { booking: Booking }) {
+  const meta = serviceMeta[booking.service];
+
+  return (
+    <Dialog>
+      <DialogTrigger className="inline-flex h-9 items-center rounded-full border border-border bg-background px-4 text-xs font-medium text-foreground/80 transition-colors hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+        View Details
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{booking.title}</DialogTitle>
+          <DialogDescription>
+            <span className="inline-flex items-center gap-1.5">
+              <meta.icon className="h-3.5 w-3.5" />
+              {meta.label}
+            </span>
+          </DialogDescription>
+        </DialogHeader>
+
+        <dl className="divide-y divide-border">
+          <DetailRow label="Status">
+            <span
+              className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusStyles[booking.status]}`}
+            >
+              {booking.status.toLowerCase()}
+            </span>
+          </DetailRow>
+          <DetailRow label="Booking ID">
+            <span className="font-mono uppercase">{booking.reference}</span>
+          </DetailRow>
+          <DetailRow label="Location">{booking.location || "—"}</DetailRow>
+          <DetailRow label="Date">
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+              {booking.dateLabel}
+            </span>
+          </DetailRow>
+          <DetailRow label="Guests">
+            <span className="inline-flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5 text-muted-foreground" />
+              {booking.partySize}{" "}
+              {booking.partySize === 1 ? "person" : "people"}
+            </span>
+          </DetailRow>
+          <DetailRow label="Balance on arrival">
+            ₱{booking.balance.toLocaleString()}
+          </DetailRow>
+        </dl>
+
+        <DialogFooter>
+          <DialogClose className="inline-flex h-9 items-center justify-center rounded-full border border-border bg-background px-4 text-sm font-medium text-foreground/80 transition-colors hover:border-primary/50 hover:text-primary">
+            Close
+          </DialogClose>
+          <Link
+            href={`/tours/${meta.slug}/${booking.offeringId}`}
+            className="inline-flex h-9 items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            View tour page
+          </Link>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

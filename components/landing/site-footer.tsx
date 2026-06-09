@@ -51,7 +51,7 @@ export function SiteFooter() {
               />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-background/75">
-              Discover Guimaras with GuimarasGo — island-hopping, day tours, and
+              Discover Guimaras with GuimarasGo: island-hopping, day tours, and
               rentals, all locally run. A simple, honest way to book your
               adventure.
             </p>

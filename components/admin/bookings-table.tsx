@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Check, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
-  adminBookings,
   bookingStatusStyles,
   formatDate,
   type AdminBooking,
@@ -32,10 +31,15 @@ function FeeBadge({ paid }: { paid: boolean }) {
   );
 }
 
-export function BookingsTable() {
-  // Local-only state: status edits feel live but reset on reload (no backend).
-  const [rows, setRows] = useState<AdminBooking[]>(adminBookings);
+export function BookingsTable({
+  initialRows,
+}: {
+  initialRows: AdminBooking[];
+}) {
+  const [rows, setRows] = useState<AdminBooking[]>(initialRows);
   const [filter, setFilter] = useState<Filter>("all");
+  const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
 
   const counts = useMemo(() => {
     return {
@@ -49,8 +53,37 @@ export function BookingsTable() {
   const visible =
     filter === "all" ? rows : rows.filter((r) => r.status === filter);
 
+  // Optimistically update, then persist. Revert the row if the server rejects it.
   function setStatus(id: string, status: BookingStatus) {
+    const previous = rows.find((r) => r.id === id)?.status;
+    setError(null);
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
+
+    const revert = () => {
+      if (previous) {
+        setRows((prev) =>
+          prev.map((r) => (r.id === id ? { ...r, status: previous } : r)),
+        );
+      }
+    };
+
+    startTransition(async () => {
+      try {
+        const res = await fetch(`/api/bookings/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          setError(data.error ?? "Could not update the booking. Try again.");
+          revert();
+        }
+      } catch {
+        setError("Network error. Try again.");
+        revert();
+      }
+    });
   }
 
   const statusSelectClass = (status: BookingStatus) =>
@@ -59,8 +92,25 @@ export function BookingsTable() {
       bookingStatusStyles[status],
     );
 
+  if (rows.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
+        <p className="text-sm font-medium text-foreground">No bookings yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Reservations will appear here as customers book.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
+      {error ? (
+        <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
+          {error}
+        </p>
+      ) : null}
+
       {/* Status filters */}
       <div className="flex flex-wrap gap-2">
         {filters.map((f) => (

@@ -1,3 +1,6 @@
+import { Suspense } from "react";
+import { connection } from "next/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   CalendarCheck,
@@ -8,30 +11,56 @@ import {
 } from "lucide-react";
 
 import { StatCard, AdminPageHeader } from "@/components/admin/stat-card";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import {
-  adminBookings,
-  getAdminStats,
+  getAdminBookings,
+  getAdminBookingStats,
+  type AdminBookingStats,
+} from "@/services/bookings/admin";
+import {
   formatDate,
   bookingStatusStyles,
+  type AdminBooking,
 } from "@/lib/admin/data";
 
 export default function AdminOverviewPage() {
-  const stats = getAdminStats();
-
-  const recent = [...adminBookings]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
-    .slice(0, 6);
-
   return (
     <div className="space-y-8">
       <AdminPageHeader
         title="Overview"
         description="A snapshot of bookings and reservation-fee revenue."
       />
+      <Suspense fallback={<OverviewSkeleton />}>
+        <OverviewLoader />
+      </Suspense>
+    </div>
+  );
+}
 
+async function OverviewLoader() {
+  await connection();
+  const auth = await requireAdmin();
+  if (!auth.ok) {
+    redirect(auth.status === 401 ? "/auth/login?next=/admin" : "/");
+  }
+
+  const [stats, recent] = await Promise.all([
+    getAdminBookingStats(),
+    getAdminBookings(6),
+  ]);
+
+  return <OverviewContent stats={stats} recent={recent} />;
+}
+
+function OverviewContent({
+  stats,
+  recent,
+}: {
+  stats: AdminBookingStats;
+  recent: AdminBooking[];
+}) {
+  return (
+    <div className="space-y-8">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={CalendarCheck}
@@ -73,77 +102,101 @@ export default function AdminOverviewPage() {
           </Link>
         </div>
 
-        {/* Mobile / tablet: cards */}
-        <div className="grid gap-3 p-4 md:hidden">
-          {recent.map((booking) => (
-            <div
-              key={booking.id}
-              className="rounded-xl border border-border bg-background p-4"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <span className="font-medium text-foreground">
-                  {booking.customerName}
-                </span>
-                <span
-                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${bookingStatusStyles[booking.status]}`}
-                >
-                  {booking.status}
-                </span>
-              </div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                {booking.tourTitle}
-              </div>
-              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                <span className="font-mono">{booking.reference}</span>
-                <span>{formatDate(booking.date)}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Desktop: table */}
-        <div className="hidden md:block">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
-                <th className="px-5 py-3 font-medium">Reference</th>
-                <th className="px-5 py-3 font-medium">Customer</th>
-                <th className="px-5 py-3 font-medium">Tour</th>
-                <th className="px-5 py-3 font-medium">Date</th>
-                <th className="px-5 py-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
+        {recent.length === 0 ? (
+          <p className="px-5 py-10 text-center text-sm text-muted-foreground">
+            No bookings yet — reservations will appear here as customers book.
+          </p>
+        ) : (
+          <>
+            {/* Mobile / tablet: cards */}
+            <div className="grid gap-3 p-4 md:hidden">
               {recent.map((booking) => (
-                <tr
+                <div
                   key={booking.id}
-                  className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
+                  className="rounded-xl border border-border bg-background p-4"
                 >
-                  <td className="px-5 py-3 font-mono text-xs text-muted-foreground">
-                    {booking.reference}
-                  </td>
-                  <td className="px-5 py-3 font-medium text-foreground">
-                    {booking.customerName}
-                  </td>
-                  <td className="px-5 py-3 text-muted-foreground">
-                    {booking.tourTitle}
-                  </td>
-                  <td className="px-5 py-3 text-muted-foreground">
-                    {formatDate(booking.date)}
-                  </td>
-                  <td className="px-5 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="font-medium text-foreground">
+                      {booking.customerName}
+                    </span>
                     <span
-                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${bookingStatusStyles[booking.status]}`}
+                      className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${bookingStatusStyles[booking.status]}`}
                     >
                       {booking.status}
                     </span>
-                  </td>
-                </tr>
+                  </div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {booking.tourTitle}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                    <span className="font-mono">{booking.reference}</span>
+                    <span>{formatDate(booking.date)}</span>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+
+            {/* Desktop: table */}
+            <div className="hidden md:block">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
+                    <th className="px-5 py-3 font-medium">Reference</th>
+                    <th className="px-5 py-3 font-medium">Customer</th>
+                    <th className="px-5 py-3 font-medium">Tour</th>
+                    <th className="px-5 py-3 font-medium">Date</th>
+                    <th className="px-5 py-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recent.map((booking) => (
+                    <tr
+                      key={booking.id}
+                      className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
+                    >
+                      <td className="px-5 py-3 font-mono text-xs text-muted-foreground">
+                        {booking.reference}
+                      </td>
+                      <td className="px-5 py-3 font-medium text-foreground">
+                        {booking.customerName}
+                      </td>
+                      <td className="px-5 py-3 text-muted-foreground">
+                        {booking.tourTitle}
+                      </td>
+                      <td className="px-5 py-3 text-muted-foreground">
+                        {formatDate(booking.date)}
+                      </td>
+                      <td className="px-5 py-3">
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${bookingStatusStyles[booking.status]}`}
+                        >
+                          {booking.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </section>
+    </div>
+  );
+}
+
+function OverviewSkeleton() {
+  return (
+    <div className="space-y-8">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-28 w-full animate-pulse rounded-2xl bg-muted"
+          />
+        ))}
+      </div>
+      <div className="h-72 w-full animate-pulse rounded-2xl bg-muted" />
     </div>
   );
 }

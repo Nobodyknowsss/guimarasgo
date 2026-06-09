@@ -39,7 +39,7 @@ export function Hero() {
         </h1>
 
         <p className="mt-6 max-w-xl text-pretty text-base text-white/85 sm:text-lg">
-          Island-hopping, day tours, and motorcycle rentals — all locally run by
+          Island-hopping, day tours, and motorcycle rentals, all locally run by
           GuimarasGo. Reserve your spot with a small fee, pay the rest on
           arrival.
         </p>

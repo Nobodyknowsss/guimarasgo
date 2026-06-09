@@ -2,24 +2,34 @@
 
 import { useMemo, useState } from "react";
 
-import {
-  adminBookings,
-  adminListings,
-  tourCategoryOptions,
-} from "@/lib/admin/data";
+import { adminListings, tourCategoryOptions } from "@/lib/admin/data";
 
-// Anchored to June 2026 so the grid lines up with the sample bookings.
+// The bits of a booking the calendar needs to count slots per day.
+export type AvailabilityBooking = {
+  /** yyyy-mm-dd */
+  date: string;
+  categoryLabel: string;
+  tourTitle: string;
+  status: "confirmed" | "pending" | "cancelled";
+};
+
+// Anchored to June 2026 (the current month for this build) so the grid lines up
+// with today. Real bookings are counted per day from the `bookings` prop.
 const YEAR = 2026;
 const MONTH = 5; // June (0-indexed)
 const MONTH_LABEL = "June 2026";
-const TODAY = 1;
+const TODAY = 9;
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const fieldClass =
   "h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
 
-export function AvailabilityCalendar() {
+export function AvailabilityCalendar({
+  bookings,
+}: {
+  bookings: AvailabilityBooking[];
+}) {
   const [category, setCategory] = useState("all");
   const [offering, setOffering] = useState("all");
 
@@ -39,7 +49,7 @@ export function AvailabilityCalendar() {
 
   function countOnDay(day: number): number {
     const key = `${YEAR}-${String(MONTH + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return adminBookings.filter((b) => {
+    return bookings.filter((b) => {
       if (b.date !== key || b.status === "cancelled") return false;
       if (categoryLabel && b.categoryLabel !== categoryLabel) return false;
       if (offeringTitle && b.tourTitle !== offeringTitle) return false;

@@ -111,35 +111,33 @@ export function ToursExplorer({ tours }: { tours: TourItem[] }) {
 
   return (
     <>
-      <div className="mb-8 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <div className="inline-flex min-w-full gap-1 rounded-full border border-border bg-card p-1 shadow-sm sm:min-w-0">
-          {tabOrder.map((key) => {
-            const active = key === activeTab;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setActiveTab(key)}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+      <div className="mb-8 flex flex-wrap gap-2">
+        {tabOrder.map((key) => {
+          const active = key === activeTab;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setActiveTab(key)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                active
+                  ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                  : "bg-card text-muted-foreground ring-1 ring-border hover:text-foreground"
+              }`}
+            >
+              {tabLabel(key)}
+              <span
+                className={`rounded-full px-1.5 text-xs ${
                   active
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-primary/15 text-primary"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
-                {tabLabel(key)}
-                <span
-                  className={`rounded-full px-1.5 text-xs ${
-                    active
-                      ? "bg-primary/15 text-primary"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {counts[key]}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                {counts[key]}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {filtered.length === 0 ? (
